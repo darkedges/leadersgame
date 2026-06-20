@@ -1,0 +1,17 @@
+{
+  "name": "leaders-puzzle",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "shots": "node screenshots.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.61.0",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.2"
+  }
+}
