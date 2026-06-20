@@ -33,6 +33,7 @@ let finalScore = 0; // banked score for the just-solved puzzle
 let deadEnd = false; // current placement can no longer reach a solution
 let revealed = false; // show the solution after a loss
 let notice = ''; // transient message (e.g. failed hint)
+let modalDismissed = false; // end-of-game modal closed to view the board
 
 // endless-run tallies
 let totalScore = 0;
@@ -83,6 +84,7 @@ function startRun() {
 function loadPuzzle(resetClock: boolean) {
   size = DIFFS[diff].size;
   puzzle = generatePuzzle(size);
+  if (import.meta.env.DEV) (window as unknown as { __solution?: number[] }).__solution = puzzle.solution;
   placed = new Set();
   history = [];
   penalties = 0;
@@ -90,6 +92,7 @@ function loadPuzzle(resetClock: boolean) {
   deadEnd = false;
   revealed = false;
   notice = '';
+  modalDismissed = false;
   status = 'playing';
   if (resetClock) startMs = performance.now();
   startTicker();
@@ -243,18 +246,19 @@ function render() {
       row and one per column. No two leaders may touch, not even diagonally.
       Placing a leader (♛) locks every cell it controls, including the rest of its
       region (✕). Solve before the score reaches 0.</p>
-
-      ${renderBanner(endless)}
     </div>
+    ${renderModal(endless)}
   `;
 
   wire();
 }
 
 function renderStatusLine(endless: boolean): string {
+  if (status === 'won') return `Solved! Score ${finalScore}.`;
+  if (status === 'lost') return endless ? `Run over — ${totalScore} points.` : "Time's up.";
   if (notice) return notice;
   if (deadEnd) return '⚠ No solution from here — undo a leader to get back on track.';
-  if (endless && lastBank > 0 && status === 'playing') return `Nice — banked +${lastBank}. Next puzzle!`;
+  if (endless && lastBank > 0) return `Nice — banked +${lastBank}. Next puzzle!`;
   return 'Place a leader in every region.';
 }
 
@@ -290,16 +294,37 @@ function renderCells(): string {
   return html;
 }
 
-function renderBanner(endless: boolean): string {
-  if (status === 'won') {
-    return `<div class="banner win">Solved! Final score <strong>${finalScore}</strong>.</div>`;
+function renderModal(endless: boolean): string {
+  if ((status !== 'won' && status !== 'lost') || modalDismissed) return '';
+
+  const won = status === 'won';
+  let title: string;
+  let sub: string;
+  if (won) {
+    title = 'Solved!';
+    sub = `Final score <strong>${finalScore}</strong>.`;
+  } else if (endless) {
+    title = 'Run over';
+    sub = `You solved <strong>${solvedCount}</strong> puzzle${solvedCount === 1 ? '' : 's'} for <strong>${totalScore}</strong> points.`;
+  } else {
+    title = "Time's up";
+    sub = 'The score reached 0.';
   }
-  if (status === 'lost') {
-    return endless
-      ? `<div class="banner lose">Run over — you solved <strong>${solvedCount}</strong> puzzle${solvedCount === 1 ? '' : 's'} for <strong>${totalScore}</strong> points.</div>`
-      : `<div class="banner lose">Out of time — the score hit 0.</div>`;
-  }
-  return '';
+  const primaryLabel = endless ? 'New run' : 'New game';
+
+  return `
+    <div class="modal-backdrop" id="modal-backdrop">
+      <div class="modal ${won ? 'win' : 'lose'}" role="dialog" aria-modal="true" aria-label="${title}">
+        <button class="modal-close" id="modal-close" aria-label="Close">×</button>
+        <div class="modal-icon">${won ? '♛' : '⏱'}</div>
+        <h2 class="modal-title">${title}</h2>
+        <p class="modal-sub">${sub}</p>
+        <div class="modal-actions">
+          ${won ? '' : `<button id="modal-reveal">Reveal solution</button>`}
+          <button id="modal-new" class="primary">${primaryLabel}</button>
+        </div>
+      </div>
+    </div>`;
 }
 
 function updateHud() {
@@ -338,6 +363,22 @@ function wire() {
     render();
   });
   document.querySelector('#new')!.addEventListener('click', startRun);
+
+  // end-of-game modal
+  document.querySelector('#modal-new')?.addEventListener('click', startRun);
+  document.querySelector('#modal-reveal')?.addEventListener('click', () => {
+    revealed = true;
+    closeModal();
+  });
+  document.querySelector('#modal-close')?.addEventListener('click', closeModal);
+  document.querySelector('#modal-backdrop')?.addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeModal(); // click outside the card
+  });
+}
+
+function closeModal() {
+  modalDismissed = true;
+  render();
 }
 
 function dismissSplash() {
@@ -350,6 +391,13 @@ function dismissSplash() {
     window.setTimeout(() => el.remove(), 700); // fallback if transitionend doesn't fire
   }, 500);
 }
+
+// Esc closes the end-of-game modal (registered once, survives re-renders).
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && (status === 'won' || status === 'lost') && !modalDismissed) {
+    closeModal();
+  }
+});
 
 // boot
 startRun();

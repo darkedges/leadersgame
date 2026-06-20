@@ -211,15 +211,63 @@ button:disabled { opacity: 0.45; cursor: default; }
   color: var(--muted);
 }
 
-.banner {
-  margin-top: 14px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  font-size: 15px;
-  text-align: center;
+/* end-of-game modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(8, 10, 22, 0.62);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: modal-fade 0.18s ease both;
 }
-.banner.win { background: rgba(95, 208, 168, 0.16); border: 1px solid #5fd0a8; }
-.banner.lose { background: rgba(229, 122, 122, 0.16); border: 1px solid #e57a7a; }
+.modal {
+  position: relative;
+  width: min(100%, 360px);
+  background: var(--panel);
+  border: 1px solid #2a3162;
+  border-radius: 18px;
+  padding: 28px 24px 22px;
+  text-align: center;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+  animation: modal-pop 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.modal.win { border-top: 4px solid #5fd0a8; }
+.modal.lose { border-top: 4px solid #e57a7a; }
+.modal-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  line-height: 1;
+  font-size: 22px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+}
+.modal-icon { font-size: 46px; line-height: 1; }
+.modal.win .modal-icon { color: var(--accent); }
+.modal.lose .modal-icon { color: #e57a7a; }
+.modal-title { margin: 8px 0 6px; font-size: 24px; font-weight: 800; }
+.modal-sub { margin: 0 0 18px; color: var(--muted); font-size: 14.5px; }
+.modal-sub strong { color: var(--ink); }
+.modal-actions { display: flex; gap: 10px; }
+
+@keyframes modal-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modal-pop {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .modal-backdrop, .modal { animation: none; }
+}
 
 /* Small screens: trim chrome so the board (and its cells/tap targets) get as
    much width as possible, and give controls comfortable touch heights. */
