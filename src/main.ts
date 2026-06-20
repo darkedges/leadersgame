@@ -340,5 +340,17 @@ function wire() {
   document.querySelector('#new')!.addEventListener('click', startRun);
 }
 
+function dismissSplash() {
+  const el = document.getElementById('splash');
+  if (!el) return;
+  // brief minimum so the splash doesn't merely flash on a fast load
+  window.setTimeout(() => {
+    el.classList.add('hide');
+    el.addEventListener('transitionend', () => el.remove(), { once: true });
+    window.setTimeout(() => el.remove(), 700); // fallback if transitionend doesn't fire
+  }, 500);
+}
+
 // boot
 startRun();
+dismissSplash();

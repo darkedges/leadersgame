@@ -47,6 +47,25 @@ npm run preview  # serve the production build
 npm run shots    # responsive screenshot check (needs `npm run dev` running)
 ```
 
+## Installable app (PWA)
+
+The game is a Progressive Web App, so it can be installed to a phone/desktop home
+screen and run standalone (no browser chrome), with offline support:
+
+- **Manifest + service worker** via `vite-plugin-pwa` (`registerType: autoUpdate`,
+  so a new deploy refreshes the installed app). Config lives in `vite.config.ts`.
+- **Branded splash** — an inline overlay in `index.html` (painted before any JS/CSS
+  loads) that fades out once the game mounts; Android also gets a native splash
+  generated from the manifest icon + colours.
+- **Icons** are committed in `public/` (`pwa-192/512`, `pwa-maskable-512`,
+  `apple-touch-icon`, `favicon.svg`). Regenerate them from the vector source with:
+
+  ```bash
+  npm run icons   # rasterises tools/gen-icons.mjs via Playwright's Chromium
+  ```
+
+  Cloudflare only runs `npm run build`, so the icons must stay committed.
+
 ## Responsiveness
 
 The layout is mobile-first: the panel is `min(100%, 560px)`, the board fills the

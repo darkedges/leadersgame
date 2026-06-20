@@ -22,6 +22,9 @@ body {
   background: radial-gradient(1200px 800px at 50% -10%, #232a52, var(--bg));
   color: var(--ink);
   padding: clamp(8px, 3vw, 24px);
+  /* keep clear of the notch / status bar when installed as a standalone app */
+  padding-top: max(clamp(8px, 3vw, 24px), env(safe-area-inset-top, 0px));
+  padding-bottom: max(clamp(8px, 3vw, 24px), env(safe-area-inset-bottom, 0px));
   -webkit-tap-highlight-color: transparent;
 }
 

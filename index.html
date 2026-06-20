@@ -2,10 +2,57 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Leaders — a logic puzzle</title>
+
+    <meta name="theme-color" content="#0f1226" />
+    <meta name="description" content="A timed one-leader-per-region logic puzzle." />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Leaders" />
+
+    <!-- Critical splash styles, inlined so the splash is painted before any
+         external CSS/JS loads (matches the app background for a seamless start). -->
+    <style>
+      #splash {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(1200px 800px at 50% -10%, #232a52, #0f1226);
+        color: #e8eaff;
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        transition: opacity 0.45s ease;
+      }
+      #splash.hide { opacity: 0; pointer-events: none; }
+      .splash-inner { text-align: center; }
+      .splash-mark {
+        font-size: 84px;
+        line-height: 1;
+        color: #ffd166;
+        filter: drop-shadow(0 6px 24px rgba(255, 209, 102, 0.35));
+        animation: splash-pop 0.6s ease both, splash-float 2.4s ease-in-out 0.6s infinite;
+      }
+      .splash-title { font-size: 34px; font-weight: 800; letter-spacing: 0.5px; margin-top: 10px; }
+      .splash-tag { color: #9aa3c7; font-size: 14px; margin-top: 4px; }
+      @keyframes splash-pop { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+      @keyframes splash-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+      @media (prefers-reduced-motion: reduce) { .splash-mark { animation: none; } }
+    </style>
   </head>
   <body>
+    <div id="splash" role="img" aria-label="Leaders">
+      <div class="splash-inner">
+        <div class="splash-mark">♛</div>
+        <div class="splash-title">Leaders</div>
+        <div class="splash-tag">a timed logic puzzle</div>
+      </div>
+    </div>
+
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
