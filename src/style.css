@@ -71,6 +71,8 @@ button {
 .board {
   display: grid;
   /* grid-template-columns is set inline to repeat(size, 1fr) */
+  grid-auto-rows: 1fr; /* equal rows regardless of cell content, so placing a
+                          ♛/✕ glyph never changes the board height */
   aspect-ratio: 1;
   background: var(--line);
   border: 3px solid var(--line);
