@@ -15,9 +15,10 @@ body {
   min-height: 100vh;
   min-height: 100dvh; /* avoid mobile browser-chrome jump */
   display: grid;
-  /* "safe" so that when content is taller than the viewport it scrolls from the
-     top instead of being centred and clipped off-screen. */
-  place-items: safe center;
+  grid-template-columns: minmax(0, 1fr); /* full-width column; panel centres via margin-inline:auto */
+  /* vertical: centre, but fall back to top-aligned + scrollable (no clipping)
+     when the panel is taller than the window */
+  align-content: safe center;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   background: radial-gradient(1200px 800px at 50% -10%, #232a52, var(--bg));
   color: var(--ink);
@@ -29,8 +30,10 @@ body {
 }
 
 .game {
-  /* full width minus the body gutter, capped — never wider than the viewport */
-  width: min(100%, 560px);
+  /* width is capped by 560px and also by the window height (minus chrome) so the
+     whole panel fits on screen and can actually be centred on desktop */
+  width: min(100%, 560px, max(320px, calc(100dvh - 366px)));
+  margin-inline: auto; /* horizontal centring within the grid column */
   background: var(--panel);
   border: 1px solid #2a3162;
   border-radius: 18px;
